@@ -1,0 +1,245 @@
+<html>
+    <head>
+       <link rel="stylesheet" href="../css/bookingpage.css" type="text/css">
+       <link href="https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap" rel="stylesheet">
+       <link rel="stylesheet" href="../lib/bootstrap-4.4.1-dist/css/bootstrap.min.css">
+       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+       <script src="../lib/bootstrap-4.4.1-dist/js/bootstrap.min.js"></script>
+       <script src="https://kit.fontawesome.com/9c0c3e0988.js" crossorigin="anonymous"></script>
+       <link rel="stylesheet" href="../css/master.css">
+    </head>
+    <title>Book Now | Link Cabs</title>
+    <body>
+        <div>
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top text-dark " style="background-color: black!important;">
+                <div class="container">
+                    <a class="navbar-brand" href="../index.html"><i class="fas fa-link fa-sm"></i> link\Cabs</a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                        <div class="navbar-nav ml-auto">
+                            <a class="nav-item nav-link" href="#">About</a>
+                            <a class="nav-item nav-link" href="#">Contact</a>
+                            <a class="nav-item nav-link" href="#">Login</a>
+                            <a class="nav-item nav-link" href="#">Signup</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div style="display: block">
+            <input id="origin-input" class="controls" type="text"
+                placeholder="Enter an origin location" style="position: relative;">
+    
+            <input id="destination-input" class="controls" type="text"
+                placeholder="Enter a destination location">
+    
+            <div id="mode-selector" class="controls">
+                <input type="radio" name="type" id="changemode-hatch" checked="checked">
+                <label for="changemode-walking">Mini</label>
+        
+                <input type="radio" name="type" id="changemode-sedan">
+                <label for="changemode-transit">Sedan</label>
+        
+                <input type="radio" name="type" id="changemode-suv">
+                <label for="changemode-driving">SUV</label>
+                <input type="button" value="Ride Now" class="btn btn-primary btn-sm">
+            </div>
+        </div>
+    
+        <div id="map"></div>
+    
+        <script>
+    // This example requires the Places library. Include the libraries=places
+    // parameter when you first load the API. For example:
+    // <script
+    // src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
+    
+    function initMap() {
+      var map = new google.maps.Map(document.getElementById('map'), {
+        mapTypeControl: false,
+        center: {lat: 17.3850, lng: 78.4867},
+        zoom: 11,
+        styles: [
+                    {elementType: 'geometry', stylers: [{color: '#242f3e'}]},
+                    {elementType: 'labels.text.stroke', stylers: [{color: '#242f3e'}]},
+                    {elementType: 'labels.text.fill', stylers: [{color: '#746855'}]},
+                    {
+                    featureType: 'administrative.locality',
+                    elementType: 'labels.text.fill',
+                    stylers: [{color: '#d59563'}]
+                    },
+                    {
+                    featureType: 'poi',
+                    elementType: 'labels.text.fill',
+                    stylers: [{color: '#d59563'}]
+                    },
+                    {
+                    featureType: 'poi.park',
+                    elementType: 'geometry',
+                    stylers: [{color: '#263c3f'}]
+                    },
+                    {
+                    featureType: 'poi.park',
+                    elementType: 'labels.text.fill',
+                    stylers: [{color: '#6b9a76'}]
+                    },
+                    {
+                    featureType: 'road',
+                    elementType: 'geometry',
+                    stylers: [{color: '#38414e'}]
+                    },
+                    {
+                    featureType: 'road',
+                    elementType: 'geometry.stroke',
+                    stylers: [{color: '#212a37'}]
+                    },
+                    {
+                    featureType: 'road',
+                    elementType: 'labels.text.fill',
+                    stylers: [{color: '#9ca5b3'}]
+                    },
+                    {
+                    featureType: 'road.highway',
+                    elementType: 'geometry',
+                    stylers: [{color: '#746855'}]
+                    },
+                    {
+                    featureType: 'road.highway',
+                    elementType: 'geometry.stroke',
+                    stylers: [{color: '#1f2835'}]
+                    },
+                    {
+                    featureType: 'road.highway',
+                    elementType: 'labels.text.fill',
+                    stylers: [{color: '#f3d19c'}]
+                    },
+                    {
+                    featureType: 'transit',
+                    elementType: 'geometry',
+                    stylers: [{color: '#2f3948'}]
+                    },
+                    {
+                    featureType: 'transit.station',
+                    elementType: 'labels.text.fill',
+                    stylers: [{color: '#d59563'}]
+                    },
+                    {
+                    featureType: 'water',
+                    elementType: 'geometry',
+                    stylers: [{color: '#17263c'}]
+                    },
+                    {
+                    featureType: 'water',
+                    elementType: 'labels.text.fill',
+                    stylers: [{color: '#515c6d'}]
+                    },
+                    {
+                    featureType: 'water',
+                    elementType: 'labels.text.stroke',
+                    stylers: [{color: '#17263c'}]
+                    }
+                ]
+      });
+    
+      new AutocompleteDirectionsHandler(map);
+    }
+    
+    /**
+     * @constructor
+     */
+    function AutocompleteDirectionsHandler(map) {
+      this.map = map;
+      this.originPlaceId = null;
+      this.destinationPlaceId = null;
+      this.travelMode = 'DRIVING';
+      this.directionsService = new google.maps.DirectionsService;
+      this.directionsRenderer = new google.maps.DirectionsRenderer;
+      this.directionsRenderer.setMap(map);
+    
+      var originInput = document.getElementById('origin-input');
+      var destinationInput = document.getElementById('destination-input');
+      var modeSelector = document.getElementById('mode-selector');
+    
+      var originAutocomplete = new google.maps.places.Autocomplete(originInput);
+      // Specify just the place data fields that you need.
+      originAutocomplete.setFields(['place_id']);
+    
+      var destinationAutocomplete =
+          new google.maps.places.Autocomplete(destinationInput);
+      // Specify just the place data fields that you need.
+      destinationAutocomplete.setFields(['place_id']);
+    
+      this.setupClickListener('changemode-hatch', 'WALKING');
+      this.setupClickListener('changemode-sedan', 'TRANSIT');
+      this.setupClickListener('changemode-suv', 'DRIVING');
+    
+      this.setupPlaceChangedListener(originAutocomplete, 'ORIG');
+      this.setupPlaceChangedListener(destinationAutocomplete, 'DEST');
+    
+      this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(originInput);
+      this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(
+          destinationInput);
+      this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(modeSelector);
+    }
+    
+    // Sets a listener on a radio button to change the filter type on Places
+    // Autocomplete.
+    AutocompleteDirectionsHandler.prototype.setupClickListener = function(
+        id, mode) {
+      var radioButton = document.getElementById(id);
+      var me = this;
+    
+      radioButton.addEventListener('click', function() {
+        me.travelMode = mode;
+        me.route();
+      });
+    };
+    
+    AutocompleteDirectionsHandler.prototype.setupPlaceChangedListener = function(
+        autocomplete, mode) {
+      var me = this;
+      autocomplete.bindTo('bounds', this.map);
+    
+      autocomplete.addListener('place_changed', function() {
+        var place = autocomplete.getPlace();
+    
+        if (!place.place_id) {
+          window.alert('Please select an option from the dropdown list.');
+          return;
+        }
+        if (mode === 'ORIG') {
+          me.originPlaceId = place.place_id;
+        } else {
+          me.destinationPlaceId = place.place_id;
+        }
+        me.route();
+      });
+    };
+    
+    AutocompleteDirectionsHandler.prototype.route = function() {
+      if (!this.originPlaceId || !this.destinationPlaceId) {
+        return;
+      }
+      var me = this;
+    
+      this.directionsService.route(
+          {
+            origin: {'placeId': this.originPlaceId},
+            destination: {'placeId': this.destinationPlaceId},
+            travelMode: this.travelMode
+          },
+          function(response, status) {
+            if (status === 'OK') {
+              me.directionsRenderer.setDirections(response);
+            } else {
+              window.alert('Directions request failed due to ' + status);
+            }
+          });
+    };
+    
+        </script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBNJjiJiUBBI0WhrIuZJ409zioWqawiSqs&libraries=places&callback=initMap"async defer></script>
+    </body>
+</html>
