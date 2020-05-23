@@ -6,6 +6,20 @@
     font-size: 25px;
     text-decoration: none;
 }
+body{
+    font-family: 'Roboto Mono', monospace;
+}
+footer p{
+    text-align: center;
+    color: black;
+    font-family: 'Roboto Mono', monospace;
+}
+#footer{
+    margin-left: 585px;
+}
+#footer i{
+    margin:10px 10px;
+}
 #coverimg{
     display: block;
     margin-left: auto;
@@ -110,11 +124,7 @@
         opacity: 0;
     }
 }
-/* section {
-  position: relative;
-  width: 100%;
-  height: 100%;
-} */
+
 #section2{
     padding-bottom: 40px;
 }
